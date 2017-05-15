@@ -47,12 +47,12 @@ CMD SS_VER=$(ss-server -h | head -n 2 | grep shadowsocks-libev | awk '{print $2}
     && echo "TIMEOUT:   $SS_TIMEOUT                         " \
     && echo "DNS:       $SS_DNS, $SS_DNS2                   " \
     && echo "===============================================" \
-    ss-server -s $SS_ADDR \
-              -p $SS_PORT \
-              -k $SS_PWD \
-              -m $SS_METHOD \
-              -t $SS_TIMEOUT \
-              -d $SS_DNS \
-              -d $SS_DNS2 \
-              --fast-open \
-              -u
+    && ss-server -s $SS_ADDR \
+                 -p $SS_PORT \
+                 -k $SS_PWD \
+                 -m $SS_METHOD \
+                 -t $SS_TIMEOUT \
+                 -d $SS_DNS \
+                 -d $SS_DNS2 \
+                 --fast-open \
+                 -u

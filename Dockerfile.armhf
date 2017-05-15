@@ -1,0 +1,64 @@
+FROM armhf/alpine
+
+MAINTAINER JinnLynn <eatfishlin@gmail.com>
+
+ARG SS_VER=3.0.6
+ARG SS_URL=https://github.com/shadowsocks/shadowsocks-libev/releases/download/v$SS_VER/shadowsocks-libev-$SS_VER.tar.gz
+ARG REPO_URL=https://mirrors.aliyun.com/alpine
+
+ENV SS_ADDR     0.0.0.0
+ENV SS_PORT     8388
+ENV SS_LOCAL    $SS_PORT
+ENV SS_PWD=
+ENV SS_METHOD   aes-256-cfb
+ENV SS_TIMEOUT  300
+ENV SS_DNS      8.8.8.8
+ENV SS_DNS2     8.8.4.4
+
+RUN set -ex && \
+    apk add --no-cache --virtual .build-deps \
+                                autoconf \
+                                build-base \
+                                curl \
+                                libev-dev \
+                                libtool \
+                                linux-headers \
+                                udns-dev \
+                                libsodium-dev \
+                                mbedtls-dev \
+                                pcre-dev \
+                                tar \
+                                udns-dev && \
+    cd /tmp && \
+    curl -sSL $SS_URL | tar xz --strip 1 && \
+    ./configure --prefix=/usr --disable-documentation && \
+    make install && \
+    cd .. && \
+
+    runDeps="$( \
+        scanelf --needed --nobanner /usr/bin/ss-* \
+            | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+            | xargs -r apk info --installed \
+            | sort -u \
+    )" && \
+    apk add --no-cache --virtual .run-deps $runDeps && \
+    apk del .build-deps && \
+    rm -rf /tmp/*
+
+EXPOSE $SS_PORT/tcp $SS_PORT/udp
+
+CMD SS_VER=$(ss-server -h | head -n 2 | grep shadowsocks-libev | awk '{print $2}') \
+    && SS_PWD=${SS_PWD:-$(head -n 5 /dev/urandom | md5sum | head -c 8)} \
+    && echo "===============================================" \
+    && echo "Shadowsocks is now ready for use!              " \
+    && echo "                                               " \
+    && echo "VERSION:   $SS_VER                             " \
+    && echo "SERVER IP: $SS_ADDR                            " \
+    && echo "PORT:      $SS_PORT                            " \
+    && echo "PASSWORD:  $SS_PWD                             " \
+    && echo "LOCAL:     $SS_LOCAL                           " \
+    && echo "METHOD:    $SS_METHOD                          " \
+    && echo "TIMEOUT:   $SS_TIMEOUT                         " \
+    && echo "DNS:       $SS_DNS, $SS_DNS2                   " \
+    && echo "===============================================" \
+    && ss-local -h

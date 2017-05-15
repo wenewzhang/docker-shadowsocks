@@ -1,4 +1,4 @@
-FROM armhf/alpine
+FROM resin/qemux86-64-alpine
 
 MAINTAINER JinnLynn <eatfishlin@gmail.com>
 

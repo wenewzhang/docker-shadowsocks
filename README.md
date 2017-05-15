@@ -2,7 +2,9 @@
 
 [shadowsocks-libev][]服务器端的docker容器镜像构建，[Docker Hub][hub]。
 
-shadowsocks-libev 版本: 2.5.6
+shadowsocks-libev 版本: 3.0.6
+
+镜像tag即表明其运行的shadowsocks-libev版本。
 
 ### 使用
 
@@ -18,7 +20,6 @@ docker run -d --env SS_PWD=MY_PASSWORD -p 8388:8388 jinnlynn/shadowsocks
 SS_ADDR     0.0.0.0
 SS_PORT     8388
 SS_PWD
-SS_OTA      1
 SS_METHOD   aes-256-cfb
 SS_TIMEOUT  300
 SS_DNS      8.8.8.8
@@ -26,8 +27,6 @@ SS_DNS2     8.8.4.4
 ```
 
 密码： SS_PWD默认为空，如果未指定将随机生成。
-
-一次性验证：当SS_OTA=1时启用一次性验证，默认启用，将其设置为0即可关闭。
 
 一般情况下只要设置SS_PWD即可。
 
